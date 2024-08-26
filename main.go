@@ -11,30 +11,45 @@ import (
 )
 
 func main() {
-	content := readFromArgs()
-	if content == "" {
-		content = readFromStdin()
+	// todo: parse flags like -h, --help, -v, --version
+	userValue := readFromArgs()
+	if userValue == "" {
+		userValue = readFromStdin()
 	}
-	if content == "" {
-		fmt.Printf("Usage: uts <unix timestamp>\n")
+	if userValue == "" {
+		fmt.Printf(`Usage: uts <unix timestamp>
+
+Examples:
+# seconds precision
+$ uts 1724692825
+> Mon, 26 Aug 2024 20:20:25 UTC
+
+# nanoseconds precision
+$ uts 1723140436809000000
+> Thu, 08 Aug 2024 21:07:16 UTC
+
+# pipe from stdin
+$ echo 1724692825 | uts
+> Mon, 26 Aug 2024 20:20:25 UTC
+`)
 		os.Exit(1)
 	}
 
-	timestamp, err := strconv.ParseInt(content, 10, 64)
+	unixtime, err := strconv.ParseInt(userValue, 10, 64)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 		os.Exit(1)
 	}
-	var unixTimestamp time.Time
 
-	// Dec 31 2100 23:59:59
-	if timestamp > math.MaxInt32 {
-		unixTimestamp = time.Unix(timestamp/1000000000, timestamp%1000000000)
+	var timestamp time.Time
+	// todo: add support for milliseconds precision, floating point unixtime and different formats
+	if unixtime > math.MaxInt32 { // 19 Jan 2038 06:14:07
+		timestamp = time.Unix(unixtime/1000000000, unixtime%1000000000)
 	} else {
-		unixTimestamp = time.Unix(timestamp, 0)
+		timestamp = time.Unix(unixtime, 0)
 	}
 
-	fmt.Printf("%s\n", unixTimestamp.Format(time.RFC1123))
+	fmt.Printf("%s\n", timestamp.Format(time.RFC1123))
 }
 
 func readFromArgs() string {
