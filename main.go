@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"math"
@@ -10,14 +11,15 @@ import (
 	"time"
 )
 
-func main() {
-	// todo: parse flags like -h, --help, -v, --version
-	userValue := readFromArgs()
-	if userValue == "" {
-		userValue = readFromStdin()
-	}
-	if userValue == "" {
-		fmt.Printf(`Usage: uts <unix timestamp>
+const VERSION = `0.1.0`
+
+const HELP_MESSAGE = `Convert unix timestamp to human readable format
+
+Usage: uts [options] <unix timestamp>
+
+Options:
+  -h, --help      Show this help message
+  -v, --version   Show version
 
 Examples:
 # seconds precision
@@ -30,8 +32,35 @@ $ uts 1723140436809000000
 
 # pipe from stdin
 $ echo 1724692825 | uts
-> Mon, 26 Aug 2024 20:20:25 UTC
-`)
+> Mon, 26 Aug 2024 20:20:25 UTC`
+
+func main() {
+	var (
+		help, version bool
+	)
+
+	flag.BoolVar(&help, "h", false, "Show this help message")
+	flag.BoolVar(&help, "help", false, "Show this help message")
+	flag.BoolVar(&version, "v", false, "Show version")
+	flag.BoolVar(&version, "version", false, "Show version")
+	flag.Parse()
+
+	if help {
+		fmt.Println(HELP_MESSAGE)
+		os.Exit(0)
+	}
+
+	if version {
+		fmt.Println(VERSION)
+		os.Exit(0)
+	}
+
+	userValue := readFromArgs()
+	if userValue == "" {
+		userValue = readFromStdin()
+	}
+	if userValue == "" {
+		fmt.Printf(HELP_MESSAGE)
 		os.Exit(1)
 	}
 
