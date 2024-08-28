@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const VERSION = `v0.1.1`
+const VERSION = `v0.2.0`
 
 const HELP_MESSAGE = `Convert unix timestamp to human readable format
 
