@@ -18,10 +18,28 @@ $ uts 1724692825
 > Mon, 26 Aug 2024 20:20:25 UTC
 ```
 
+### milliseconds precision
+```bash
+$ uts 1724858701000
+> Wed, 28 Aug 2024 18:25:01 UTC
+```
+
+### microseconds precision
+```bash
+$ uts 1724858701000000
+> Wed, 28 Aug 2024 18:25:01 UTC
+```
+
 ### nanoseconds precision
 ```bash
 $ uts 1723140436809000000
 > Thu, 08 Aug 2024 21:07:16 UTC
+```
+
+### float seconds precision
+```bash
+$ uts 1724692825.123456789
+> Mon, 26 Aug 2024 20:20:25 MSK
 ```
 
 ### pipe from stdin
