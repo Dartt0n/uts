@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const VERSION = `0.1.0`
+const VERSION = `v0.1.1`
 
 const HELP_MESSAGE = `Convert unix timestamp to human readable format
 
