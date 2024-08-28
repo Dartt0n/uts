@@ -4,9 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"math"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -33,6 +31,12 @@ $ uts 1723140436809000000
 # pipe from stdin
 $ echo 1724692825 | uts
 > Mon, 26 Aug 2024 20:20:25 UTC`
+
+type userFormat interface {
+	fmt.Stringer
+	Match(string) bool
+	Parse(string) (time.Time, error)
+}
 
 func main() {
 	var (
@@ -64,21 +68,29 @@ func main() {
 		os.Exit(1)
 	}
 
-	unixtime, err := strconv.ParseInt(userValue, 10, 64)
-	if err != nil {
-		fmt.Printf("Error: %s\n", err)
+	userFormats := []userFormat{sFmt{}, msFmt{}, usFmt{}, nsFmt{}, fsFmt{}}
+
+	anyFormatUsed := false
+	for _, format := range userFormats {
+		if !format.Match(userValue) {
+			continue
+		}
+
+		timestamp, err := format.Parse(userValue)
+		if err != nil {
+			fmt.Printf("failed to parse \"%s\" value using \"%s\" format with error: %s\n", userValue, format, err)
+			os.Exit(1)
+		}
+
+		fmt.Printf("%s\n", timestamp.Format(time.RFC1123))
+		anyFormatUsed = true
+		break
+	}
+
+	if !anyFormatUsed {
+		fmt.Printf("failed to parse \"%s\" value using any of the supported formats\n", userValue)
 		os.Exit(1)
 	}
-
-	var timestamp time.Time
-	// todo: add support for milliseconds precision, floating point unixtime and different formats
-	if unixtime > math.MaxInt32 { // 19 Jan 2038 06:14:07
-		timestamp = time.Unix(unixtime/1000000000, unixtime%1000000000)
-	} else {
-		timestamp = time.Unix(unixtime, 0)
-	}
-
-	fmt.Printf("%s\n", timestamp.Format(time.RFC1123))
 }
 
 func readFromArgs() string {
@@ -98,7 +110,7 @@ func readFromStdin() string {
 		return ""
 	}
 
-	if stats.Mode()&os.ModeNamedPipe != 0 {
+	if stats.Mode()&os.ModeNamedPipe == 0 {
 		return ""
 	}
 
