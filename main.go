@@ -69,7 +69,7 @@ func readFromStdin() string {
 		return ""
 	}
 
-	if stats.Size() == 0 {
+	if stats.Mode()&os.ModeNamedPipe != 0 {
 		return ""
 	}
 
