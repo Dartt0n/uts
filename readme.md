@@ -58,3 +58,8 @@ $ echo 1724692825 | uts
 ```bash
 just run
 ```
+
+### Test
+```bash
+just test
+```
