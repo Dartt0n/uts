@@ -64,6 +64,15 @@ func readFromArgs() string {
 func readFromStdin() string {
 	reader := os.Stdin
 
+	stats, err := reader.Stat()
+	if err != nil {
+		return ""
+	}
+
+	if stats.Size() == 0 {
+		return ""
+	}
+
 	buffer, err := io.ReadAll(reader)
 	if err != nil {
 		return ""
